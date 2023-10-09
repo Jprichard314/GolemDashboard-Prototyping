@@ -4,4 +4,147 @@ format: html
 editor: visual
 ---
 
-## 
+# Prototyping a Shiny Dashboard
+
+# Purpose
+
+The purpose of this document is to layout a pipeline for a 311 Text Analytics Dashboard.
+
+We'll explore working with data validation tools like pointblank and validate, as well as pipeline tools like targets.
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(janitor)
+```
+
+```{r}
+# Import API Call
+source('R/rUtils/dataCapture/apis.R')
+
+# Import Cleaning Functions.
+source('R/2_cleaning.R')
+```
+
+```{{r}}
+add_headers(a = 1, b = 2)
+#> <request>
+#> Headers:
+#> * a: 1
+#> * b: 2
+
+```
+
+# Quick API Call Against PHL.CART.COM
+
+## Quick Tangent: Postgre and Carto
+
+When I call against the API -- I'm calling against a POSTGRE Carto DB, but because of the need to do URL Encoding, I can't pass certain characters (including +s) easily into the query. Keep this in mind when working with intervals in POSTGRE.
+
+```{r}
+query <- "SELECT * FROM public_cases_fc WHERE REQUESTED_DATETIME >= '09/01/2023'"
+
+data <- getData_phlCartoApi(query)
+```
+
+```{r}
+URLencode("https://phl.carto.com/api/v2/sql?q=SELECT DATE_PART('MONTH',CURRENT_DATE), DATE_TRUNC('MONTH',CURRENT_DATE),CURRENT_DATE%2B3
+&format=CSV",reserved=TRUE)
+```
+
+This query doesn't work! It's breaking at the %2B -- an encoded plus sign.
+
+```{r}
+httr::GET(URLencode("https://phl.carto.com/api/v2/sql?q=SELECT DATE_PART('MONTH',CURRENT_DATE), DATE_TRUNC('MONTH',CURRENT_DATE),CURRENT_DATE%2B3
+&format=CSV",reserved=TRUE))
+```
+
+## Capture the data.
+
+We'll use our little API call to get the data.
+
+```{r}
+data <-  getData_phlCartoApi("SELECT * FROM public_cases_fc WHERE REQUESTED_DATETIME >= '09/01/2023'") 
+```
+
+### When we import our data, we're importing it as a large matrix, and the conversion seems like a pain.
+
+```{r}
+class(data)
+```
+
+```{r}
+data%>%as.data.frame%>%lapply(class)
+```
+
+### We can coerce everything to a character, then to another data type, and remove "NULL" characters with na_if
+
+```{r}
+data <- data %>%
+  as.data.frame %>%
+  mutate_all(as.character) %>%
+  mutate_all(na_if,"NULL")
+
+head(data,5) %>% lapply(class)
+
+```
+
+Ahh, the Null values are characters...duh
+
+```{r}
+data <- 
+  data %>%
+  mutate(
+      requested_datetime = janitor::convert_to_datetime(requested_datetime)
+    , updated_datetime   = janitor::convert_to_datetime(updated_datetime)
+    , expected_datetime  = janitor::convert_to_datetime(expected_datetime)
+    , lat                = as.numeric(lat)
+    , lon                = as.numeric(lon)
+  )
+
+data %>% lapply(class)
+
+
+```
+
+We can add in a little validation -- so we're making sure our data is really what we're after. Lets take a quick look at PointBlank for that. I've written these cleaning steps to functions in the cleaning script.
+
+Lets check to see if this works:
+
+```{r}
+data <- getData_phlCartoApi(query) %>%
+           clean_cartoDb_threeOneOne_data()
+
+data%>%lapply(class)
+```
+
+# EDA and Validation
+
+## We'll keep it simple (stupid) and use our basic EDA workflow for R.
+
+```{r}
+
+simpleEdaScript <- function(df)
+{
+  list_data <- c(
+      columnNames = colnames(df)
+    , length      = lapply(df,length)
+  ) r
+  
+  df_eda <- 
+    do.call(
+        rbind
+      , list_data
+  )
+  
+  return(df_eda)
+}  
+
+
+
+
+```
+
+```{r}
+data %>% as.data.frame %>% mutate_all(as.character)
+```
