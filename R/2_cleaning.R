@@ -19,7 +19,7 @@ clean_cartoDb_threeOneOne_data <- function(df)
     mutate_all(na_if,"NULL") %>%
     # Write Datetypes and Numerics
     mutate(
-      requested_datetime = janitor::convert_to_datetime(requested_datetime)
+        requested_datetime = janitor::convert_to_datetime(requested_datetime)
       , updated_datetime   = janitor::convert_to_datetime(updated_datetime)
       , expected_datetime  = janitor::convert_to_datetime(expected_datetime)
       , lat                = as.numeric(lat)
