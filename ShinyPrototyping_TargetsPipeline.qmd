@@ -4,23 +4,52 @@ format: html
 editor: visual
 ---
 
-## Quarto
+# Setting up the \_targets.R File
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+1\) Sourcing libraries
 
-## Running Code
+-   We'll source our packages from 0_libraries for this, if this causes issues, we'll scoot it.
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+2\) Target options:
 
-```{r}
-1 + 1
+-   We should do some research on setting up multi-threaded workloads.
+
+    -   [Crew](https://github.com/wlandau/crew) is an R library for doing multi-threaded work.
+    -   [Targets documentation](https://books.ropensci.org/targets/crew.html#footnotes) for setting up Crew in a pipeline.
+
+-   Packages
+
+    -   From <https://books.ropensci.org/targets/packages.html>
+
+        > For most pipelines, it is straightforward to load the R packages that your targets need in order to run. You can either:
+        >
+        > 1.  Call `library()` at the top of the target script file (default: `_targets.R`) to load each package the conventional way, or
+        >
+        > 2.  Name the required packages using the `packages` argument of `tar_option_set()`.
+        >
+        > 2\. is often faster, especially for utilities like `tar_visnetwork()`, because it avoids loading packages unless absolutely necessary.
+
+    -   We'll call the same set of packages we called above.
+
+3\) tar_source
+
+-   We'll call tar_source with our API call and our cleaning function
+
+```{{r}}
+
+tar_source(
+  c(
+      "R/rUtils/dataCapture/apis.R"
+    , "R/2_cleaning.R"
+  )
+)
+
 ```
 
-You can add options to executable code like this
+# Then we'll run
+
+...and it just works
 
 ```{r}
-#| echo: false
-2 * 2
+targets::tar_visnetwork()
 ```
-
-The `echo: false` option disables the printing of code (only output is displayed).

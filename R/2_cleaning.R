@@ -11,12 +11,6 @@ clean_cartoDb_threeOneOne_data <- function(df)
   
   df_clean <- 
     df %>%
-    # Convert from matrix to data.frame
-    as.data.frame %>%
-    # Coerce all data to characters from lists
-    mutate_all(as.character) %>%
-    # Rewrite nulls to NA
-    mutate_all(na_if,"NULL") %>%
     # Write Datetypes and Numerics
     mutate(
         requested_datetime = janitor::convert_to_datetime(requested_datetime)
