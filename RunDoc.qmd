@@ -1,0 +1,37 @@
+---
+title: "Run Targets"
+format: html
+editor: visual
+---
+
+# Run Targets
+
+```{r}
+targets::tar_make()
+```
+
+# Output Visualization
+
+```{r}
+targets::tar_visnetwork()
+```
+
+# Review Meta Data
+
+## Data Validation Steps
+
+### Post Extraction
+
+```{r}
+
+source('R/3_validators.R')
+validate_1 <- validate::confront(
+                    dat = targets::tar_read(dataFromApiCall_columnsSet)
+                  , x = pipeline_validation_postExtract
+    )
+
+validate_1 %>% plot()
+validate_1 %>% summary()
+
+
+```

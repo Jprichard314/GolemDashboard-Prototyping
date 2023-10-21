@@ -15,6 +15,8 @@ tar_option_set(
                   "tidyverse"
                 , "lubridate"
                 , "janitor"
+                , "glue"
+                , "validate"
                ) # packages that your targets need to run
   # format = "qs", # Optionally set the default storage format. qs is fast.
   #
@@ -54,6 +56,8 @@ tar_source(
   c(
       "R/rUtils/dataCapture/apis.R"
     , "R/2_cleaning.R"
+    , "R/1_importData.R"
+    , "R/3_validators.R"
   )
 )
 # source("other_functions.R") # Source other scripts as needed.
@@ -62,11 +66,26 @@ tar_source(
 list(
   tar_target(
       name = dataFromApiCall_raw
-    , command = getData_phlCartoApi("SELECT * FROM public_cases_fc WHERE REQUESTED_DATETIME >= '08/01/2023'")
-    #, cue = tar_cue(mode = 'always')
+      # Capture 12 months of data from 311.
+    , command = pipeline_extract_cartoDbMonthQuery("SELECT * FROM public_cases_fc WHERE REQUESTED_DATETIME >= ")
+      # Set this to always run.
+    , cue = tar_cue(mode = 'always')
   ),
+  
   tar_target(
-    name = dataFromApiCall_columnsSet,
-    command = clean_cartoDb_threeOneOne_data(dataFromApiCall_raw)
+      name = dataFromApiCall_columnsSet
+    , command = clean_cartoDb_threeOneOne_data(dataFromApiCall_raw)
+    # We're leaving this set to the default cue so it won't run if no
+    # updates have been made to the data.
+  ),
+  
+  # Step to run validation for unique IDs and complete request_date data.
+  # Will drop rule breakers.
+  tar_target(
+      name    = dataFromApiCall_postExtractValidation
+    , command = satisfying(
+                    x = dataFromApiCall_columnsSet
+                  , y = pipeline_validation_postExtract
+    )
   )
 )

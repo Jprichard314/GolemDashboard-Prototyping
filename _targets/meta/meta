@@ -1,5 +1,8 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
 clean_cartoDb_threeOneOne_data|function|ff0d9ed03e947015|||||||||||||||
-dataFromApiCall_columnsSet|stem|50e58f842031e8ea|5827e12d0e35e4d1|9a1436e5a6166cde|1762857852||t19645.5955758174s|984f8ce11f936308|6650598|rds|local|vector|||0.94||
-dataFromApiCall_raw|stem|3b8158889e80b856|1a55519859bc311b|d83e453746548dfc|-2006559161||t19645.5955464534s|f04cbf5be0ead185|6758559|rds|local|vector|||21.22||
+dataFromApiCall_columnsSet|stem|634684d1716490ff|5827e12d0e35e4d1|85536c6c98c63424|1762857852||t19651.6089273668s|7f00d55c17e76fa1|32919080|rds|local|vector|||1.11||
+dataFromApiCall_postExtractValidation|stem|1ff017822ddbb8b6|5baa51c4434b6f8d|de466bfa2a247b58|-1192046749||t19651.7047698734s|7f00d55c17e76fa1|32919080|rds|local|vector|||3.32||
+dataFromApiCall_raw|stem|00e4f5f8259e74c6|64bc8f646d27a31b|393fe102405f62c0|-2006559161||t19651.7046267364s|a96805082c60fa5d|33544328|rds|local|vector|||82.17||
 getData_phlCartoApi|function|544f346554acd4f7|||||||||||||||
+pipeline_extract_cartoDbMonthQuery|function|1cf6d406378482e8|||||||||||||||
+pipeline_validation_postExtract|object|558576f2f94f0910|||||||||||||||
