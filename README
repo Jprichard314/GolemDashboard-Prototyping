@@ -1,0 +1,5 @@
+This repo is for creating a testing a test pipeline to feed into a golem application.
+
+Goals for the pipeline are:
+  - Must utilized Targets for orchestration
+  - Must utilize data validation techniques

@@ -61,8 +61,9 @@ tar_source(
 # Replace the target list below with your own:
 list(
   tar_target(
-    name = dataFromApiCall_raw,
-    command = getData_phlCartoApi("SELECT * FROM public_cases_fc WHERE REQUESTED_DATETIME >= '09/01/2023'")
+      name = dataFromApiCall_raw
+    , command = getData_phlCartoApi("SELECT * FROM public_cases_fc WHERE REQUESTED_DATETIME >= '08/01/2023'")
+    #, cue = tar_cue(mode = 'always')
   ),
   tar_target(
     name = dataFromApiCall_columnsSet,

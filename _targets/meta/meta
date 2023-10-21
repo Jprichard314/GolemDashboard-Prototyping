@@ -1,5 +1,5 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
 clean_cartoDb_threeOneOne_data|function|ff0d9ed03e947015|||||||||||||||
-dataFromApiCall_columnsSet|stem|b402439ac69f30bd|5827e12d0e35e4d1|fd8e182420b42cde|1762857852||t19644.6181791947s|342d19f12fbf7ab8|3628431|rds|local|vector|||0.42||
-dataFromApiCall_raw|stem|89155d4db32eeab1|b32a0dadb38513f9|d83e453746548dfc|-2006559161||t19644.6168642943s|acd60d30241b8039|3694671|rds|local|vector|||12.07||
+dataFromApiCall_columnsSet|stem|50e58f842031e8ea|5827e12d0e35e4d1|9a1436e5a6166cde|1762857852||t19645.5955758174s|984f8ce11f936308|6650598|rds|local|vector|||0.94||
+dataFromApiCall_raw|stem|3b8158889e80b856|1a55519859bc311b|d83e453746548dfc|-2006559161||t19645.5955464534s|f04cbf5be0ead185|6758559|rds|local|vector|||21.22||
 getData_phlCartoApi|function|544f346554acd4f7|||||||||||||||
