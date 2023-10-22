@@ -1,8 +1,10 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
 clean_cartoDb_threeOneOne_data|function|ff0d9ed03e947015|||||||||||||||
-dataFromApiCall_columnsSet|stem|634684d1716490ff|5827e12d0e35e4d1|85536c6c98c63424|1762857852||t19651.6089273668s|7f00d55c17e76fa1|32919080|rds|local|vector|||1.11||
-dataFromApiCall_postExtractValidation|stem|1ff017822ddbb8b6|5baa51c4434b6f8d|de466bfa2a247b58|-1192046749||t19651.7047698734s|7f00d55c17e76fa1|32919080|rds|local|vector|||3.32||
-dataFromApiCall_raw|stem|00e4f5f8259e74c6|64bc8f646d27a31b|393fe102405f62c0|-2006559161||t19651.7046267364s|a96805082c60fa5d|33544328|rds|local|vector|||82.17||
+dataFromApiCall_columnsSet|stem|a6db3c885d26d3db|5827e12d0e35e4d1|6413069e7c572c40|1762857852||t19652.9131361268s|5492293834ac71fc|32903118|rds|local|vector|||1.19||
+dataFromApiCall_postExtractValidation|stem|7656ffe141472423|5baa51c4434b6f8d|fa24a1d1d6f44ea6|-1192046749||t19652.9149102762s|422d2ce67e89ec92|32903119|rds|local|vector|||3.34||
+dataFromApiCall_raw|stem|e71b51317fdf7235|64bc8f646d27a31b|393fe102405f62c0|-2006559161||t19652.9147664449s|dc067c54e4ddc48a|33530773|rds|local|vector|||83.68||
 getData_phlCartoApi|function|544f346554acd4f7|||||||||||||||
 pipeline_extract_cartoDbMonthQuery|function|1cf6d406378482e8|||||||||||||||
-pipeline_validation_postExtract|object|558576f2f94f0910|||||||||||||||
+pipeline_transformation_generateRepeatCallGroupings|function|b8513e61708fb35f|||||||||||||||
+pipeline_validation_postExtract|object|56ace34c23641dfb|||||||||||||||
+repeatCallsAnalysis_initialize|stem|1f919975cfda7584|8749955524c2863e|50e223ef60bc14cb|-1719311895||t19652.915421165s|4a27be8379b6d1e5|39849247|rds|local|vector|||36.21||

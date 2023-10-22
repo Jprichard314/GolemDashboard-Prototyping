@@ -58,6 +58,7 @@ tar_source(
     , "R/2_cleaning.R"
     , "R/1_importData.R"
     , "R/3_validators.R"
+    , "R/4_transformations.R"
   )
 )
 # source("other_functions.R") # Source other scripts as needed.
@@ -87,5 +88,20 @@ list(
                     x = dataFromApiCall_columnsSet
                   , y = pipeline_validation_postExtract
     )
+  ), 
+  
+  ## Run Repeat Calls Analysis
+  tar_target(
+      name    = repeatCallsAnalysis_initialize
+    , command = pipeline_transformation_generateRepeatCallGroupings(
+          dataset        = dataFromApiCall_postExtractValidation
+        , field_orderBy  = "requested_datetime"
+        , field_groupBy  = "address"
+        , field_category = "subject"
+    )
   )
+  
+  ##  Aggregate down to repeat call groups
+  
+  ##  join repeat call groups back to base data.
 )
