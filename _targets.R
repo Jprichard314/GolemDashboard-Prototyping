@@ -68,7 +68,7 @@ list(
   tar_target(
       name = dataFromApiCall_raw
       # Capture 12 months of data from 311.
-    , command = pipeline_extract_cartoDbMonthQuery("SELECT * FROM public_cases_fc WHERE REQUESTED_DATETIME >= ")
+    , command = pipeline_extract_cartoDbMonthQuery("SELECT * FROM public_cases_fc WHERE CLOSED_DATETIME >= ")
       # Set this to always run.
     , cue = tar_cue(mode = 'always')
   ),
