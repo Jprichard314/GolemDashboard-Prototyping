@@ -1,49 +1,4 @@
 # Transformations
-# 
-# ## Generate Repeat Calls
-# DEP___pipeline_transformation_generateRepeatCallGroupings <-  function(
-    #     dataset
-#     , field_orderBy
-#     , field_groupBy
-#     , fields_lagColumn
-# )
-# {
-#   # Order temp
-#   temp <-
-#     dataset %>%
-#     arrange(.[[field_orderBy]]) %>%
-#     group_by(.[[field_groupBy]])
-#
-#   # Lag multiple columns
-#   temp <-
-#     temp %>%
-#     mutate(
-#         across(
-#           fields_lagColumn
-#         , function(x) lag(
-#             x
-#           , n = 1
-#           , default = NA
-#         )
-#         , .names = "lag_{col}"
-#       )
-#     )
-#
-#   # Ungroup
-#   temp <-
-#     temp%>%
-#     ungroup() %>%
-#     select(-'.[[field_groupBy]]')
-#
-#
-#
-#   return(temp)
-#
-# }
-
-
-
-
 
 pipeline_transformation_generateRepeatCallGroupings <-  function(
     dataset
@@ -64,7 +19,8 @@ pipeline_transformation_generateRepeatCallGroupings <-  function(
   # Order temp
   temp <-
     temp %>%
-    group_by(.[[field_groupBy]])
+    group_by(.[[field_groupBy]]) %>%
+    arrange(alias_field_orderBy)
   
   # Create Lag Column Names
   column_orderLag = paste("lag_",field_orderBy,sep='')
@@ -78,13 +34,11 @@ pipeline_transformation_generateRepeatCallGroupings <-  function(
           x = alias_field_orderBy
         , n = 1
         , default = NA
-        , order_by = alias_field_orderBy
       )
       , !!column_categoryLag := dplyr::lag(
           x = alias_field_category
         , n = 1
         , default = NA
-        , order_by = alias_field_orderBy
       )
     ) %>%
     ungroup() %>%
@@ -105,16 +59,18 @@ pipeline_transformation_generateRepeatCallGroupings <-  function(
     mutate(
         isRepeat  = case_when(
           timeDiff <= 72 & (
-            !!column_categoryLag == alias_field_category
+            .[[!!column_categoryLag]] == alias_field_category
           ) ~ 1
           , .default = 0
       )
       , isRepeatCallGroup  = case_when(
           timeDiff <= 72 & (
-            !!column_categoryLag == alias_field_category
+            .[[!!column_categoryLag]] == alias_field_category
           ) ~ 0
           , .default = 1
       )
+      , t1 = !!column_categoryLag
+      , t2 = !!column_orderLag
     ) %>%
     group_by(.[[field_groupBy]]) %>%
     
@@ -125,11 +81,26 @@ pipeline_transformation_generateRepeatCallGroupings <-  function(
     ungroup() %>% 
     select(-c(
           '.[[field_groupBy]]'
-         , alias_field_category
-         , alias_field_orderBy
+         #, alias_field_category
+         #, alias_field_orderBy
       )
     )
   
   return(temp)
+  
+}
+
+
+pipeline_transformation_generateRepeatCallStatistics <- function(
+      dataset
+    , 
+  
+)
+{
+  
+  
+  
+  
+  
   
 }
