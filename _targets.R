@@ -65,12 +65,15 @@ tar_source(
 
 # Replace the target list below with your own:
 list(
+  
+  # TODO -- find a better way of handling always running this code...
+  
   tar_target(
       name = dataFromApiCall_raw
       # Capture 12 months of data from 311.
     , command = pipeline_extract_cartoDbMonthQuery("SELECT * FROM public_cases_fc WHERE CLOSED_DATETIME >= ")
       # Set this to always run.
-    , cue = tar_cue(mode = 'always')
+   # , cue = tar_cue(mode = 'always')
   ),
   
   tar_target(
@@ -99,9 +102,21 @@ list(
         , field_groupBy  = "address"
         , field_category = "subject"
     )
-  )
+  ),
   
   ##  Aggregate down to repeat call groups
   
   ##  join repeat call groups back to base data.
+  
+  ## Build datasets for visualizations.
+  
+  ### My neighborhood
+  
+  tar_target(
+      name = businessIntelligenceData__closedCalls_individualCalls
+    , command = pipeline_transformation_generateBusinessIntellDataframe_closedCalls(
+            dataset = dataFromApiCall_postExtractValidation
+          , monthsCollected = 6
+        )
+  )
 )

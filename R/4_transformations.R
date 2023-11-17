@@ -93,14 +93,49 @@ pipeline_transformation_generateRepeatCallGroupings <-  function(
 
 pipeline_transformation_generateRepeatCallStatistics <- function(
       dataset
-    , 
   
 )
 {
   
   
+  print('placeheld')
   
   
   
+}
+
+
+pipeline_transformation_generateBusinessIntellDataframe_closedCalls <- function(
+      dataset
+    , monthsCollected
+  )
+{
+  # Build dataset for visuals
+  temp <- 
+    dataset %>%
+      filter(
+          (status == "Closed")
+        & (requested_datetime >= (lubridate::floor_date(Sys.Date(),'month') - months(monthsCollected)))
+      )
+  
+  # Create Time Fields
+  temp <- 
+    temp %>%
+    mutate(
+        timeField__requested_month = lubridate::month(requested_datetime)
+      , timeField__requested_monthDate = lubridate::floor_date(requested_datetime, "month") 
+      , timeField__requested_year  = lubridate::year(requested_datetime)
+      , timeField__requested_date  = lubridate::date(requested_datetime)
+      , timeField__requested_weekDate  = lubridate::floor_date(requested_datetime, "week")
+      , timefield__resolveTime     = bizdays::bizdays(
+                                          requested_datetime
+                                        , closed_datetime
+                                        , cal = bizdays::create.calendar('my_calendar', weekdays = c('saturday','sunday'))
+                                        )
+    )
+  
+  # 
+  
+  return(temp)
   
 }

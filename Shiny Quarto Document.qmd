@@ -1,0 +1,90 @@
+---
+title: "Test Quarto Document"
+format: html
+---
+
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(glue)
+```
+
+```{r}
+theme_vis = theme(
+    plot.title = element_text(size = 20)
+  , axis.title = element_text(size = 15)
+  , axis.text = element_text(size = 15)
+  , panel.background = element_rect(
+    fill = "white"
+  )
+)
+
+```
+
+# EDA
+
+What types of calls are being generated over the past 6 months?
+
+```{r}
+#| column: screen
+#| out-width: 75%
+#| fig-align: center
+#| fig-format: svg
+#| fig-width: 20
+#| fig-height: 10
+
+# Generate tibble
+plot1__mostCommonBar <-  targets::tar_read(businessIntelligenceData__closedCalls_individualCalls) %>%
+    group_by(service_name) %>%
+    summarize(
+      Count = n()
+    ) %>%
+    arrange(-Count)
+
+
+
+ggplot(
+      plot1__mostCommonBar
+    , aes(
+        x = Count
+      , y = reorder(service_name,Count)
+    )
+) +
+geom_col(
+    fill = "#0f4d90"
+  , width = 0.75
+) + 
+geom_text(
+  label = plot1__mostCommonBar$Count
+  , hjust = 0
+  , nudge_x = 10
+) +
+labs(
+    y = "Service Name"
+  , x = "Closed Calls"
+  , title = paste(
+     "Since "
+    , targets::tar_read(businessIntelligenceData__closedCalls_individualCalls) %>% .$timeField__requested_monthDate %>% min
+    , " "
+    , plot1__mostCommonBar[1,] %>% .$service_name
+    , "'s have been the most common call type closed followed by \n"
+    , plot1__mostCommonBar[2:5,1] %>% .[[1]] %>% paste(collapse = ", ")
+    , sep = ''
+  )
+) + 
+theme_vis
+```
+
+Common Call Types
+
+```{r}
+
+
+```
+
+Location
+
+```{r}
+
+
+```
