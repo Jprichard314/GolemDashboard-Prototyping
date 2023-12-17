@@ -1225,6 +1225,20 @@
       ],
       "Hash": "3838071b66e0c566d55cc26bd6e27bf4"
     },
+<<<<<<< Updated upstream
+=======
+    "settings": {
+      "Package": "settings",
+      "Version": "0.2.7",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "grDevices",
+        "graphics"
+      ],
+      "Hash": "044078dfd387c9a6e160103978d23be4"
+    },
+>>>>>>> Stashed changes
     "snakecase": {
       "Package": "snakecase",
       "Version": "0.11.1",
