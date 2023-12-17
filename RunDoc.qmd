@@ -4,12 +4,6 @@ format: html
 editor: visual
 ---
 
-# Run Targets
-
-```{r}
-targets::tar_make()
-```
-
 # Output Visualization
 
 ```{r}

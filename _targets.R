@@ -85,4 +85,10 @@ list(
   ##  Aggregate down to repeat call groups
   
   ##  join repeat call groups back to base data.
+  
+  ## Generate Run Document
+  , tar_render(
+       name = renderQuartoRunDoc
+     , path = "RunDoc.qmd"
+  )
 )

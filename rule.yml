@@ -1,0 +1,14 @@
+rules:
+- expr: '!is.na(requested_datetime)'
+  name: 'requestedDatetime__required'
+  description: |
+    requested_datetime must exist
+- expr: is_unique(cartodb_id)
+  name: "cartodb_id__isUnique"
+  description: |
+    cartodb_id must be unique
+- expr: is_unique(objectid)
+  name: "objectid__isUnique"
+  description: |
+    objectid_id must be unique
+
