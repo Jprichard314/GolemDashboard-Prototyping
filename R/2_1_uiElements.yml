@@ -1,0 +1,4 @@
+default:
+ colors:
+  darkbenFranklinBlue:
+    hex: '#0f4d90'
