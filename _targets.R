@@ -7,7 +7,7 @@
 #____________________________________________________
 #### Load Libraries ####
 #____________________________________________________
-source("R/0_libraries.R")
+source("data/0_libraries.R")
 
 
 #____________________________________________________
@@ -33,11 +33,11 @@ options(clustermq.scheduler = "multiprocess")
 #____________________________________________________
 tar_source(
   c(
-      "R/rUtils/dataCapture/apis.R"
-    , "R/2_cleaning.R"
-    , "R/1_importData.R"
-    , "R/3_validators.R"
-    , "R/4_transformations.R"
+      "data/rUtils/dataCapture/apis.R"
+    , "data/2_cleaning.R"
+    , "data/1_importData.R"
+    , "data/3_validators.R"
+    , "data/4_transformations.R"
   )
 )
 
@@ -51,7 +51,10 @@ list(
       # Capture 12 months of data from 311.
     , command = pipeline_extract_cartoDbMonthQuery("SELECT * FROM public_cases_fc WHERE CLOSED_DATETIME >= ")
       # Set this to always run.
-    , cue = tar_cue(mode = 'always')
+    , cue = tarchetypes::tar_cue_age(
+          name = dataFromApiCall_raw
+        , age = as.difftime(7, units = "days")
+    )
   ),
   
   tar_target(

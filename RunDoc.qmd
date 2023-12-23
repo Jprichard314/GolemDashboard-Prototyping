@@ -18,7 +18,7 @@ targets::tar_visnetwork()
 
 ```{r}
 
-source('R/3_validators.R')
+source('data/3_validators.R')
 validate_1 <- validate::confront(
                     dat = targets::tar_read(dataFromApiCall_columnsSet)
                   , x = pipeline_validation_postExtract

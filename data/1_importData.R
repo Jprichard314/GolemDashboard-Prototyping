@@ -1,5 +1,5 @@
 # Import Data from CartoDB
-source("R/rUtils/dataCapture/apis.R")
+source("data/rUtils/dataCapture/apis.R")
 
 pipeline_extract_cartoDbMonthQuery <- function(
     baseQuery
