@@ -3,4 +3,3 @@
 
 # First Pass rule validation
 pipeline_validation_postExtract <- validator(.file = "rule.yml")
-
