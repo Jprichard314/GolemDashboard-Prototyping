@@ -1,6 +1,6 @@
 # ui script
 
-uiConfigs <- config::get(file = "R/2_1_uiElements.yml")
+uiConfigs <- config::get(file = "R/1_3_uiElements.yml")
 
 ui <- (
   bslib::page_navbar(
