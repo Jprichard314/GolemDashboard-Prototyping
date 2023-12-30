@@ -46,6 +46,10 @@ tar_source(
 #____________________________________________________
 
 list(
+  
+  #____________________________________________________
+  #### Generate Raw Data and Clean ####
+  #____________________________________________________
   tar_target(
       name = dataFromApiCall_raw
       # Capture 12 months of data from 311.
@@ -74,6 +78,11 @@ list(
     )
   ), 
   
+  #____________________________________________________
+  #### Run Repeat Calls Analysis ####
+  #____________________________________________________
+  
+  
   ## Run Repeat Calls Analysis
   tar_target(
       name    = repeatCallsAnalysis_initialize
@@ -88,6 +97,26 @@ list(
   ##  Aggregate down to repeat call groups
   
   ##  join repeat call groups back to base data.
+  
+  #____________________________________________________
+  #### Surface Datasets for BI ####
+  #____________________________________________________
+  , tar_target(
+        name = dashboard__overallMetrics
+      , command = pipeline_transformation__overallPageMetrics(
+          dataset = dataFromApiCall_postExtractValidation
+      )
+  )
+  , tar_target(
+        name = dashboard__weeklyAggregates
+      , command = pipeline_transformation_generateWeeklyAggregates(
+          dataset = dataFromApiCall_postExtractValidation
+      )
+  )
+  
+  #____________________________________________________
+  #### Build Run Doc. ####
+  #____________________________________________________
   
   ## Generate Run Document
   , tar_render(

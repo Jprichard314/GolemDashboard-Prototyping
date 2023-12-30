@@ -1,11 +1,12 @@
-getDataForOverallPages <- function(data){
-  
-  output <- list(
-    totalCalls = data %>% nrow(),
-    minClosedDate = data %>% .$closed_datetime %>% min(),
-    maxClosedDate = data %>% .$closed_datetime %>% max()
-  )
-  
-  return(output)
-  
+#### helper functions ####
+filter__ <- function(
+    data
+){
+  temp <- 
+    data %>%
+    mutate(rowNumber = row_number())
 }
+
+
+#### Server Functions ####
+
