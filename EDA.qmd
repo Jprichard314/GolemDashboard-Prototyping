@@ -1,0 +1,64 @@
+---
+title: "Exploratory Data Analysis"
+format: html
+editor: visual
+---
+
+# Loads
+
+## Data
+
+```{r}
+# Load Data
+targets::tar_load(repeatCallsAnalysis_initialize)
+targets::tar_load(dashboard__overallMetrics)
+targets::tar_load(dashboard__weeklyAggregates)
+
+
+```
+
+## Libraries
+
+```{r}
+
+library(tidyverse)
+library(ggplot2)
+
+```
+
+# Looking at The Data
+
+## Basics:
+
+## Calls -- Columns
+
+```{r}
+
+repeatCallsAnalysis_initialize %>% colnames
+
+```
+
+## Calls
+
+### Trend Plot: Weekly
+
+```{r}
+repeatCallsAnalysis_initialize %>% 
+  createDatetimeFields('requested_datetime',.) %>%
+  createDatetimeFields('closed_datetime',.) %>%
+  group_by(closed_datetime_week) %>%
+  summarize( count = n()) %>%
+  ggplot() +
+    geom_line(aes( x = closed_datetime_week, y = count))
+```
+
+## Repeat Calls
+
+### Repeat Call Number:
+
+```{r}
+
+re
+
+
+```
