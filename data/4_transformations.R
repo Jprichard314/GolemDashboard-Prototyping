@@ -1,5 +1,18 @@
 # Transformations
 
+#' Generate groups of likely repeated calls
+#'
+#' @param dataset 311 calls to visualize
+#' @param field_orderBy a field to order calls by, should be a date
+#' @param field_groupBy a field to group calls by, we use address.
+#' @param field_category a field to categorize calls by, we use subject.
+#'
+#' @return 311 dataset with a fields indicating
+#'          1. Whether the call is a repeat call
+#'          2. whether the call is part of a group of repeat calls.
+#' @export
+#'
+#' @examples
 pipeline_transformation_generateRepeatCallGroupings <-  function(
     dataset
     , field_orderBy
@@ -102,4 +115,51 @@ pipeline_transformation_generateRepeatCallStatistics <- function(
   
   
   
+}
+
+
+
+
+#' Generate weekly level aggregates for 311 call data
+#'
+#' @param dataset 311 call data to visualize
+#'
+#' @return a weekly level breakdown of calls by department and service_name
+#' @export
+#'
+#' @examples
+pipeline_transformation_generateWeeklyAggregates <- function(
+    dataset
+){
+  
+  temp <- 
+    dataset %>%
+      mutate(week_request = lubridate::floor_date(closed_datetime, unit = "1 week")) %>%
+      group_by(week_request, agency_responsible, service_name) %>%
+      summarize(CallCount = n())
+  
+  return(temp)
+}
+
+
+#' Generate metadata for 311 calls dataset
+#'
+#' @param dataset 311 call data to visualize.
+#'
+#' @return a list of metadata.
+#'
+#' @examples
+#' pipeline_transformation__overallPageMetrics(raw311Calls)
+pipeline_transformation__overallPageMetrics <- function(
+  dataset
+){
+
+  
+  output <- list(
+    totalCalls = dataset %>% nrow(),
+    minClosedDate = dataset %>% .$closed_datetime %>% min(),
+    maxClosedDate = dataset %>% .$closed_datetime %>% max()
+  )
+  
+  return(output)
 }

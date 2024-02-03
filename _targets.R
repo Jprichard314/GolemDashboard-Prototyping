@@ -7,7 +7,7 @@
 #____________________________________________________
 #### Load Libraries ####
 #____________________________________________________
-source("R/0_libraries.R")
+source("data/0_libraries.R")
 
 
 #____________________________________________________
@@ -33,11 +33,11 @@ options(clustermq.scheduler = "multiprocess")
 #____________________________________________________
 tar_source(
   c(
-      "R/rUtils/dataCapture/apis.R"
-    , "R/2_cleaning.R"
-    , "R/1_importData.R"
-    , "R/3_validators.R"
-    , "R/4_transformations.R"
+      "data/rUtils/dataCapture/apis.R"
+    , "data/2_cleaning.R"
+    , "data/1_importData.R"
+    , "data/3_validators.R"
+    , "data/4_transformations.R"
   )
 )
 
@@ -46,12 +46,19 @@ tar_source(
 #____________________________________________________
 
 list(
+  
+  #____________________________________________________
+  #### Generate Raw Data and Clean ####
+  #____________________________________________________
   tar_target(
       name = dataFromApiCall_raw
       # Capture 12 months of data from 311.
     , command = pipeline_extract_cartoDbMonthQuery("SELECT * FROM public_cases_fc WHERE CLOSED_DATETIME >= ")
       # Set this to always run.
-    , cue = tar_cue(mode = 'always')
+    , cue = tarchetypes::tar_cue_age(
+          name = dataFromApiCall_raw
+        , age = as.difftime(7, units = "days")
+    )
   ),
   
   tar_target(
@@ -71,6 +78,11 @@ list(
     )
   ), 
   
+  #____________________________________________________
+  #### Run Repeat Calls Analysis ####
+  #____________________________________________________
+  
+  
   ## Run Repeat Calls Analysis
   tar_target(
       name    = repeatCallsAnalysis_initialize
@@ -85,6 +97,26 @@ list(
   ##  Aggregate down to repeat call groups
   
   ##  join repeat call groups back to base data.
+  
+  #____________________________________________________
+  #### Surface Datasets for BI ####
+  #____________________________________________________
+  , tar_target(
+        name = dashboard__overallMetrics
+      , command = pipeline_transformation__overallPageMetrics(
+          dataset = dataFromApiCall_postExtractValidation
+      )
+  )
+  , tar_target(
+        name = dashboard__weeklyAggregates
+      , command = pipeline_transformation_generateWeeklyAggregates(
+          dataset = dataFromApiCall_postExtractValidation
+      )
+  )
+  
+  #____________________________________________________
+  #### Build Run Doc. ####
+  #____________________________________________________
   
   ## Generate Run Document
   , tar_render(
