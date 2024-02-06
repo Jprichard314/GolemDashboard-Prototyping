@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Exploratory Data Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="EDA_files/libs/clipboard/clipboard.min.js"></script>
+<script src="EDA_files/libs/quarto-html/quarto.js"></script>
+<script src="EDA_files/libs/quarto-html/popper.min.js"></script>
+<script src="EDA_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="EDA_files/libs/quarto-html/anchor.min.js"></script>
+<link href="EDA_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="EDA_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="EDA_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="EDA_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="EDA_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Exploratory Data Analysis</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="loads" class="level1">
+<h1>Loads</h1>
+<section id="data" class="level2">
+<h2 class="anchored" data-anchor-id="data">Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load Data</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>targets<span class="sc">::</span><span class="fu">tar_load</span>(repeatCallsAnalysis_initialize)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>targets<span class="sc">::</span><span class="fu">tar_load</span>(dashboard__overallMetrics)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>targets<span class="sc">::</span><span class="fu">tar_load</span>(dashboard__weeklyAggregates)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="libraries" class="level2">
+<h2 class="anchored" data-anchor-id="libraries">Libraries</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.3     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.0
+✔ ggplot2   3.4.3     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.0
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Source</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"data/rUtils/transformations/datetimes.R"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="looking-at-the-data" class="level1">
+<h1>Looking at The Data</h1>
+<section id="basics" class="level2">
+<h2 class="anchored" data-anchor-id="basics">Basics:</h2>
+</section>
+<section id="calls-columns" class="level2">
+<h2 class="anchored" data-anchor-id="calls-columns">Calls – Columns</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>repeatCallsAnalysis_initialize <span class="sc">%&gt;%</span> colnames</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "cartodb_id"             "the_geom"               "the_geom_webmercator"  
+ [4] "objectid"               "service_request_id"     "subject"               
+ [7] "status"                 "status_notes"           "service_name"          
+[10] "service_code"           "agency_responsible"     "service_notice"        
+[13] "requested_datetime"     "updated_datetime"       "expected_datetime"     
+[16] "closed_datetime"        "address"                "zipcode"               
+[19] "media_url"              "lat"                    "lon"                   
+[22] "alias_field_category"   "alias_field_orderBy"    "lag_requested_datetime"
+[25] "lag_subject"            "timeDiff"               "isRepeat"              
+[28] "isRepeatCallGroup"      "t1"                     "t2"                    
+[31] "repeatCallGroup"       </code></pre>
+</div>
+</div>
+</section>
+<section id="calls" class="level2">
+<h2 class="anchored" data-anchor-id="calls">Calls</h2>
+<section id="trend-plot-weekly" class="level3">
+<h3 class="anchored" data-anchor-id="trend-plot-weekly">Trend Plot: Weekly</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>repeatCallsAnalysis_initialize <span class="sc">%&gt;%</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">createDatetimeFields</span>(<span class="st">'requested_datetime'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">createDatetimeFields</span>(<span class="st">'closed_datetime'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(closed_datetime_week) <span class="sc">%&gt;%</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>( <span class="at">count =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="fu">aes</span>( <span class="at">x =</span> closed_datetime_week, <span class="at">y =</span> count))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Lets build a metrics table to answer questions like:</p>
+<ul>
+<li><p>Where are we spending the most time on calls.</p></li>
+<li><p>Which calls are our most common.</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>biData <span class="ot">&lt;-</span> repeatCallsAnalysis_initialize <span class="sc">%&gt;%</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">createDatetimeFields</span>(<span class="st">'requested_datetime'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">createDatetimeFields</span>(<span class="st">'closed_datetime'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ttr =</span> lubridate<span class="sc">::</span><span class="fu">interval</span>(requested_datetime, closed_datetime)<span class="sc">/</span> lubridate<span class="sc">::</span><span class="fu">hours</span>(<span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(agency_responsible, service_name) <span class="sc">%&gt;%</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">TTR_median =</span> <span class="fu">median</span>(ttr),</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">TTR_q25 =</span> <span class="fu">quantile</span>(ttr, <span class="fl">0.25</span>),</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">TTR_q75 =</span> <span class="fu">quantile</span>(ttr,<span class="fl">0.75</span>),</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>          <span class="at">TTR_q90 =</span> <span class="fu">quantile</span>(ttr,<span class="fl">0.9</span>),</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>          <span class="at">count =</span> <span class="fu">n</span>(),</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>          <span class="at">IQR =</span> TTR_q75 <span class="sc">-</span> TTR_q25) <span class="sc">%&gt;%</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>count) <span class="sc">%&gt;%</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">rank</span>(<span class="sc">-</span>count, <span class="at">ties.method =</span> <span class="st">'min'</span>),</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">simpleName =</span> glue<span class="sc">::</span><span class="fu">glue</span>(<span class="st">"{agency_responsible} - {service_name}"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'agency_responsible'. You can override
+using the `.groups` argument.</code></pre>
+</div>
+</div>
+<p>Based on the data we have our most common call type are 311 Information Requests.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>biData <span class="sc">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rank <span class="sc">&lt;=</span> <span class="dv">20</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">labelExclusion =</span> <span class="fu">case_when</span>(rank <span class="sc">==</span> <span class="fu">min</span>(rank) <span class="sc">~</span> count,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                                    rank <span class="sc">==</span> <span class="fu">max</span>(rank) <span class="sc">~</span> count,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">.default =</span> <span class="cn">NULL</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">reorder</span>(simpleName, count), <span class="at">x =</span> count)) <span class="sc">+</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">max</span>(count)<span class="sc">/</span><span class="dv">2</span>, <span class="at">y =</span> simpleName, <span class="at">label =</span> labelExclusion)) <span class="sc">+</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"25 Most Common Call Types"</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"311 Calls Completed over the Past 12 Months"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 18 rows containing missing values (`geom_text()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The range of times here is pretty broad. It’d be better to look at this as a table, then drill into it visually. When building a dashboard for this – make sure drill through possible.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>repeatCallsAnalysis_initialize <span class="sc">%&gt;%</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">simpleName =</span> glue<span class="sc">::</span><span class="fu">glue</span>(<span class="st">"{agency_responsible} - {service_name}"</span>),</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">ttr =</span> lubridate<span class="sc">::</span><span class="fu">interval</span>(requested_datetime, closed_datetime)<span class="sc">/</span> lubridate<span class="sc">::</span><span class="fu">hours</span>(<span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(biData, rank <span class="sc">&gt;=</span> <span class="dv">10</span>),</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">'simpleName'</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">merge</span>(</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    biData,</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">'simpleName'</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> ttr, <span class="at">y =</span> <span class="fu">reorder</span>(simpleName, TTR_median)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Tabular view</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>biData <span class="sc">%&gt;%</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(simpleName, count, TTR_median, TTR_q25, TTR_median, TTR_q75, TTR_q90) <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">gt</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_style</span>(<span class="at">style =</span> <span class="fu">list</span>(gt<span class="sc">::</span><span class="fu">cell_text</span>(<span class="at">size =</span> <span class="dv">8</span>)),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">locations =</span> gt<span class="sc">::</span><span class="fu">cells_body</span>()</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div id="idppwiqndl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#idppwiqndl table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#idppwiqndl thead, #idppwiqndl tbody, #idppwiqndl tfoot, #idppwiqndl tr, #idppwiqndl td, #idppwiqndl th {
+  border-style: none;
+}
+
+#idppwiqndl p {
+  margin: 0;
+  padding: 0;
+}
+
+#idppwiqndl .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#idppwiqndl .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#idppwiqndl .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#idppwiqndl .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#idppwiqndl .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#idppwiqndl .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#idppwiqndl .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#idppwiqndl .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#idppwiqndl .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#idppwiqndl .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#idppwiqndl .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#idppwiqndl .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#idppwiqndl .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#idppwiqndl .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#idppwiqndl .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#idppwiqndl .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#idppwiqndl .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#idppwiqndl .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#idppwiqndl .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#idppwiqndl .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#idppwiqndl .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#idppwiqndl .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#idppwiqndl .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#idppwiqndl .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#idppwiqndl .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#idppwiqndl .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#idppwiqndl .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#idppwiqndl .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#idppwiqndl .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#idppwiqndl .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#idppwiqndl .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#idppwiqndl .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#idppwiqndl .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#idppwiqndl .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#idppwiqndl .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#idppwiqndl .gt_left {
+  text-align: left;
+}
+
+#idppwiqndl .gt_center {
+  text-align: center;
+}
+
+#idppwiqndl .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#idppwiqndl .gt_font_normal {
+  font-weight: normal;
+}
+
+#idppwiqndl .gt_font_bold {
+  font-weight: bold;
+}
+
+#idppwiqndl .gt_font_italic {
+  font-style: italic;
+}
+
+#idppwiqndl .gt_super {
+  font-size: 65%;
+}
+
+#idppwiqndl .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#idppwiqndl .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#idppwiqndl .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#idppwiqndl .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#idppwiqndl .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#idppwiqndl .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#idppwiqndl .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="simpleName">simpleName</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="count">count</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="TTR_median">TTR_median</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="TTR_q25">TTR_q25</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="TTR_q75">TTR_q75</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="TTR_q90">TTR_q90</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philly311 Contact Center - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">285305</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">5.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">License &amp; Inspections - Maintenance Complaint</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">30563</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">2556.968889</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">639.895417</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">5737.468194</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">9614.664944</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Police Department - Abandoned Vehicle</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">29877</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">3175.366667</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">1465.614722</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">11303.669444</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">15167.780556</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Rubbish/Recyclable Material Collection</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">29197</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">170.749722</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">95.148056</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">646.515556</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">1562.136389</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Illegal Dumping</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">22846</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">239.061944</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">144.081458</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">799.414861</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">1579.849583</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Community Life Improvement Program - Graffiti Removal</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">14429</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">207.411667</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">127.336111</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">333.020556</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">531.880889</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Street Defect</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">13743</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">649.833889</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">162.019722</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">2379.422500</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5430.078333</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Street Light Outage</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">12091</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">67.226667</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">32.539444</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">118.862917</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">247.818889</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Community Life Improvement Program - Maintenance Complaint</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">8102</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">1121.724583</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">591.719167</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">2034.146806</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">3418.115528</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">License &amp; Inspections - Construction Complaints</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">7604</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">523.501250</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">211.628889</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">2256.717708</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">6415.798972</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Sanitation Violation</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">7125</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">90.330556</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">44.586389</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">216.418889</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">1514.805389</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Other (Streets)</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">5524</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">261.812083</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">124.396181</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">1521.865208</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">2741.794056</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Traffic Signal Emergency</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">5216</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">58.356944</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">25.957361</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">119.518472</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">236.371667</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">License &amp; Inspections - License Complaint</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">4491</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">2899.655000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">809.293194</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">6944.807500</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">12098.597778</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Parks &amp; Recreation - Street Trees</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">4428</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">3940.754722</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">7.411528</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">34465.357014</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">51285.363917</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">License &amp; Inspections - LI Escalation</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">4365</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">47.428333</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">26.330278</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">89.087500</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">142.460278</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Traffic (Other)</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">3496</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">368.089444</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">122.378819</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">2300.703472</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">7946.915694</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Alley Light Outage</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">3294</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">70.146528</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">25.076528</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">244.804583</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4506.868306</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Water Department (PWD) - Inlet Cleaning</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">3193</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">50.982222</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">31.245833</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">82.312778</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">122.498000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">License &amp; Inspections - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">3175</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Dangerous Sidewalk</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">3159</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">107.068611</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">47.897500</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">334.843333</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">1126.457889</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Office of Homeless Services - Homeless Encampment Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">3045</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">21.776111</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">5.544722</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">42.580000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">70.803444</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">2573</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">License &amp; Inspections - Dangerous Building Complaint</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">2296</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">1255.390556</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">185.240278</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">6235.301319</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">14284.480000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Fire Department - Smoke Detector</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">2232</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">541.872083</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">75.455139</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">1497.719722</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">2783.032000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Right of Way Unit</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1993</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">99.370278</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">48.489722</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">213.604722</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">914.106722</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Salting</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1902</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">43.612222</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">25.959236</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">58.049097</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">73.915278</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Parks &amp; Recreation - Parks and Rec Safety and Maintenance</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1813</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">7679.891389</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">1371.679722</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">24217.639722</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">34168.250389</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Police Department - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1594</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">License &amp; Inspections - Fire Safety Complaint</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1586</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">2297.575556</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">666.041458</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">5261.875833</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">9424.900556</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Dead Animal in Street</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1106</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">193.754167</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">99.405625</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">1470.671667</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">1564.909583</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Stop Sign Repair</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">816</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">506.501806</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">145.459028</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">2745.499722</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">6186.353750</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">First Judicial District/Courts - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">805</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Revenue - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">739</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Street Paving</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">735</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">477.942500</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">71.682639</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">10744.291667</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">40942.402778</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Department of Records - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">723</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Dumpster Violation</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">720</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">94.300417</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">45.923194</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">217.466736</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">1535.298167</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Complaint (Streets)</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">671</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">117.639167</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">5.154167</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">1290.032361</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">1634.103889</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Department of Public Health - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">657</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Water Department (PWD) - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">612</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philly311 Contact Center - Eclipse Help</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">561</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">6.955556</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.556944</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">25.324722</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">102.260278</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Shoveling</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">543</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">69.358611</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">34.301389</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">126.043889</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">153.852722</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Water Department (PWD) - Hydrant Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">533</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">98.431667</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">21.723056</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">246.525278</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">842.070111</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Sanitation / Dumpster Violation</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">505</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">162.708889</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">79.516389</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">1565.828333</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">1868.057500</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philly311 Contact Center - Miscellaneous</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">482</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.143681</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">29.668111</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Community Life Improvement Program - Opioid Response Unit</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">455</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">138.581111</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">80.996667</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">188.835417</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">280.798778</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Line Striping</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">452</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">197.231528</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">76.675486</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">538.197361</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">7281.503222</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Manhole Cover</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">437</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">51.108889</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">25.663056</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">119.756389</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">433.210667</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">City Commissioners Office - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">396</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Office of Homeless Services - OHS - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">392</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philadelphia Parking Authority- PPA - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">382</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Parks &amp; Recreation - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">342</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Animal Care and Control - ACCT - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">339</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Office of Human Resources- OHR - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">293</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">City Council - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">273</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Office of the Director of Finance - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">272</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Register of Wills/ Orphans Court - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">252</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">State/Federal Government Offices - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">246</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Fair Housing Commission - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">229</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Office of Housing &amp; Community Development- OHCD - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">205</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Managing Director's Office- MDO - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">191</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">District Attorney's Office - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">163</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Mayor's Office - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">148</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Community Life Improvement Program - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">141</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Office of Property Assessment- OPA - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">126</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philadelphia Housing Development Corporation- PHDC - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">123</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Fire Department - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">117</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philly311 Contact Center - KB Escalations</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">98</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">127.782500</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">8.218750</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">310.307639</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">509.756778</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Law Department/ City Solicitor - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">89</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">License &amp; Inspections - Plastic Bag Complaint</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">88</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">1060.266528</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">532.135764</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">2072.554722</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">2800.705917</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">License &amp; Inspections - License_Complaint</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">83</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">3345.780833</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">1397.452361</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">6786.978472</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">10159.354000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Department of Human Services- DHS - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">65</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Probation/Parole - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">61</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Police Department - Police Complaint</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">60</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">30.262917</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">23.609028</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">72.118125</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">119.745944</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Sheriff's Department - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">54</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Prisons - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">51</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Traffic Calming Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">51</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">130.126389</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">31.214306</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">167.883472</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">286.560833</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Behavioral Health and Intellectual Disability Services- DBHIDS - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">49</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Water Department (PWD) - Hydrant Knocked Down (No Water)</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">39</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">6.393889</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.988472</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">29.302361</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">388.851500</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Office of Innovation and Technology- OIT - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">30</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Human Relations Commission - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">26</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Office of the Inspector General - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">24</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Commerce Department - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">23</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">5.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philadelphia Housing Authority- PHA - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">22</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Water Revenue - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">21</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Free Library - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">18</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">City Representative - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">15</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Procurement Department - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">12</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Fleet Management - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">10</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.100000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Office of Emergency Management- OEM - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">10</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">5.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Public Property - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">9</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - KB Escalations</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">9</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">51.142222</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">34.371944</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">124.750000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">383.625833</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philadelphia Redevelopment Authority- PRA - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">8</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.300000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philly311 Contact Center - Graffiti Removal</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">8</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">5629.439861</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">800.256250</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">6061.517500</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">6376.122667</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">City Planning Commission - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">7</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Historical Commission - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">7</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.400000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">License &amp; Inspections - Vacant House or Commercial</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">7</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">27905.933056</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">27835.829583</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">28086.898194</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">36141.356722</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Office of Arts, Culture &amp; Creative Economy- OACCE - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">6</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.500000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">5.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">City Treasurer's Office - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">5</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">5.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">License &amp; Inspections - Maintenance Residential or Commercial</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">5</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">48231.815833</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">26389.962500</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">48233.865556</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">49085.087722</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Office of Adult Education- OAE - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">5</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.600000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philly311 Contact Center - Parks and Rec Safety and Maintenance</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">5</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.650556</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.369722</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">6.936944</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">30.773444</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Community Life Improvement Program - Vacant Lot Clean-Up</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">4</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">412.410000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">245.655556</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">498.696458</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">498.753583</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Parks &amp; Recreation - KB Escalations</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">4</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">185.045278</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">5.768056</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">904.382153</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">1876.760028</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philly311 Contact Center - Maintenance Complaint</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">4</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">265.357361</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.897569</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">656.949097</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">893.257972</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philly311 Contact Center - Street Defect</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">4</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">2491.571806</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">271.902292</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">5444.047361</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">6923.839611</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">License &amp; Inspections - Fire_Safety_Complaint</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">3</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">1479.410556</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">1183.128194</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">1582.032917</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">1643.606333</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">License &amp; Inspections - KB Escalations</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">3</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">747.157222</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">446.856111</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">961.758611</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">1090.519444</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philly311 Contact Center - Illegal Dumping</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">3</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">321.079722</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">162.912778</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">3410.433611</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5264.045944</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philly311 Contact Center - LI Escalation</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">3</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">29.721667</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">28.032778</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">65.230694</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">86.536111</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Fire Department - Complaints against Fire or EMS</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">2</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">32778.593750</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">30096.787986</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">35460.399514</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">37069.482972</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Mayor's Office of Transportation and Utilities- MOTU - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">2</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philly311 Contact Center - Abandoned Vehicle</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">2</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">31.023472</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">18.530208</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">43.516736</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">51.012694</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philly311 Contact Center - Sanitation Violation</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">2</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">525.753472</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">272.810069</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">778.696875</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">930.462917</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philly311 Contact Center - Traffic (Other)</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">2</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">5.069306</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.585486</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">5.553125</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.843417</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Police Department - KB Escalations</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">2</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">182.713750</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">176.202847</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">189.224653</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">193.131194</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Board of Revision of Taxes- BRT - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">City Controller - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">5.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">5.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">5.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">City Council - KB Escalations</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">439.583056</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">439.583056</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">439.583056</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">439.583056</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Commerce Department - KB Escalations</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">238.891944</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">238.891944</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">238.891944</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">238.891944</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Community Life Improvement Program - KB Escalations</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">29.121389</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">29.121389</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">29.121389</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">29.121389</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Ethics Board - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Fire Department - KB Escalations</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.111944</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.111944</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.111944</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.111944</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">License &amp; Inspections - Building Force</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">38540.432778</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">38540.432778</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">38540.432778</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">38540.432778</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">License &amp; Inspections - Sanitation / Dumpster Violation</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">50.147500</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">50.147500</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">50.147500</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">50.147500</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Managing Director's Office- MDO - KB Escalations</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">43.725556</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">43.725556</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">43.725556</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">43.725556</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Mayor?s Office of Black Male Engagement - MOBME - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">5.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">5.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">5.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">5.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Office of Economic Opportunity- OEO - Information Request</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000000</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.000000</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Office of Human Resources- OHR - KB Escalations</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">9.026111</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">9.026111</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">9.026111</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">9.026111</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Parks &amp; Recreation - Illegal Dumping</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">3024.637222</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">3024.637222</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">3024.637222</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">3024.637222</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Philly311 Contact Center - Dumpster Violation</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">382.164167</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">382.164167</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">382.164167</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">382.164167</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Revenue - KB Escalations</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">578.706389</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">578.706389</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">578.706389</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">578.706389</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Abandoned Bike</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.081111</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.081111</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.081111</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.081111</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Newsstand Outdoor Cafe</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">40785.830278</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">40785.830278</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">40785.830278</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">40785.830278</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Outdoor Dining Complaint</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">8.989167</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">8.989167</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">8.989167</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">8.989167</td></tr>
+    <tr><td headers="simpleName" class="gt_row gt_center" style="font-size: 8;">Streets Department - Right-of-Way</td>
+<td headers="count" class="gt_row gt_right" style="font-size: 8;">1</td>
+<td headers="TTR_median" class="gt_row gt_right" style="font-size: 8;">4.000556</td>
+<td headers="TTR_q25" class="gt_row gt_right" style="font-size: 8;">4.000556</td>
+<td headers="TTR_q75" class="gt_row gt_right" style="font-size: 8;">4.000556</td>
+<td headers="TTR_q90" class="gt_row gt_right" style="font-size: 8;">4.000556</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="repeat-calls" class="level2">
+<h2 class="anchored" data-anchor-id="repeat-calls">Repeat Calls</h2>
+<section id="repeat-call-number" class="level3">
+<h3 class="anchored" data-anchor-id="repeat-call-number">Repeat Call Number:</h3>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

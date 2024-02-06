@@ -24,6 +24,9 @@ targets::tar_load(dashboard__weeklyAggregates)
 library(tidyverse)
 library(ggplot2)
 
+# Source
+source("data/rUtils/transformations/datetimes.R")
+
 ```
 
 # Looking at The Data
@@ -44,21 +47,96 @@ repeatCallsAnalysis_initialize %>% colnames
 
 ```{r}
 repeatCallsAnalysis_initialize %>% 
-  createDatetimeFields('requested_datetime',.) %>%
-  createDatetimeFields('closed_datetime',.) %>%
+  createDatetimeFields('requested_datetime') %>%
+  createDatetimeFields('closed_datetime') %>%
   group_by(closed_datetime_week) %>%
   summarize( count = n()) %>%
   ggplot() +
     geom_line(aes( x = closed_datetime_week, y = count))
 ```
 
-## Repeat Calls
+Lets build a metrics table to answer questions like:
 
-### Repeat Call Number:
+-   Where are we spending the most time on calls.
+
+-   Which calls are our most common.
 
 ```{r}
 
-re
+biData <- repeatCallsAnalysis_initialize %>% 
+  createDatetimeFields('requested_datetime') %>%
+  createDatetimeFields('closed_datetime') %>%
+  mutate(ttr = lubridate::interval(requested_datetime, closed_datetime)/ lubridate::hours(1)) %>%
+  group_by(agency_responsible, service_name) %>%
+  summarize(TTR_median = median(ttr),
+          TTR_q25 = quantile(ttr, 0.25),
+          TTR_q75 = quantile(ttr,0.75),
+          TTR_q90 = quantile(ttr,0.9),
+          count = n(),
+          IQR = TTR_q75 - TTR_q25) %>%
+  arrange(-count) %>%
+  ungroup() %>%
+  mutate(rank = rank(-count, ties.method = 'min'),
+         simpleName = glue::glue("{agency_responsible} - {service_name}"))
+
+```
+
+Based on the data we have our most common call type are 311 Information Requests.
+
+```{r}
+
+biData %>%
+  filter(rank <= 20) %>%
+  mutate(labelExclusion = case_when(rank == min(rank) ~ count,
+                                    rank == max(rank) ~ count,
+                                    .default = NULL)) %>%
+  ggplot() +
+  geom_col(aes(y = reorder(simpleName, count), x = count)) +
+  geom_text(aes(x = max(count)/2, y = simpleName, label = labelExclusion)) +
+  labs(title = "25 Most Common Call Types",
+       subtitle = "311 Calls Completed over the Past 12 Months")
+
+```
+
+The range of times here is pretty broad. It'd be better to look at this as a table, then drill into it visually. When building a dashboard for this -- make sure drill through possible.
+
+```{r}
+repeatCallsAnalysis_initialize %>% 
+  mutate(simpleName = glue::glue("{agency_responsible} - {service_name}"),
+         ttr = lubridate::interval(requested_datetime, closed_datetime)/ lubridate::hours(1)) %>%
+  anti_join(
+    filter(biData, rank >= 10),
+    by = 'simpleName'
+  ) %>%
+  merge(
+    biData,
+    by = 'simpleName'
+  ) %>%
+  ggplot() +
+  geom_boxplot(aes(x = ttr, y = reorder(simpleName, TTR_median)))
 
 
 ```
+
+Tabular view
+
+```{r}
+
+biData %>% 
+  select(simpleName, count, TTR_median, TTR_q25, TTR_median, TTR_q75, TTR_q90) %>%
+  gt::gt() %>% 
+  gt::tab_style(style = list(gt::cell_text(size = 8)),
+                locations = gt::cells_body()
+                )
+
+```
+
+```{r}
+
+
+
+```
+
+## Repeat Calls
+
+### Repeat Call Number:
