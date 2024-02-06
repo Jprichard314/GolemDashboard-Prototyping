@@ -163,3 +163,15 @@ pipeline_transformation__overallPageMetrics <- function(
   
   return(output)
 }
+
+pipeline_transformation__calculateResolutionTimeField <- function(
+    field_openDate, field_closeDate, data){
+  
+  temp <- 
+    data %>%
+    mutate(ttr = lubridate::interval(data[[field_openDate]], data[[field_closeDate]])/ lubridate::hours(1))
+  
+  
+  return(temp)
+  
+}
