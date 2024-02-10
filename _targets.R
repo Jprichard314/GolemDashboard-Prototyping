@@ -86,7 +86,7 @@ list(
   # Add date, month, week fields for requested datetime and closed datetime
   tar_target(
     name    = dataFromApiCall_addRequestDateFields
-    , command = createDatetimeFields(data = dataFromApiCall_columnsSet,
+    , command = createDatetimeFields(data = dataFromApiCall_postExtractValidation,
                                      field_datetime = 'requested_datetime')
   ), 
   
