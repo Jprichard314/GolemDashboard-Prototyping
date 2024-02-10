@@ -38,6 +38,7 @@ tar_source(
     , "data/1_importData.R"
     , "data/3_validators.R"
     , "data/4_transformations.R"
+    , "data/rUtils/transformations/datetimes.R"
   )
 )
 
@@ -79,6 +80,31 @@ list(
   ), 
   
   #____________________________________________________
+  #### Additional Required Data Transformations ####
+  #____________________________________________________
+  
+  # Add date, month, week fields for requested datetime and closed datetime
+  tar_target(
+    name    = dataFromApiCall_addRequestDateFields
+    , command = createDatetimeFields(data = dataFromApiCall_postExtractValidation,
+                                     field_datetime = 'requested_datetime')
+  ), 
+  
+  tar_target(
+    name    = dataFromApiCall_addClosedDateFields
+    , command = createDatetimeFields(data = dataFromApiCall_addRequestDateFields,
+                                     field_datetime = 'closed_datetime')
+  ), 
+  
+  # Add Resolution Time Field
+  tar_target(
+    name    = dataFromApiCall_addTimeToResolve
+    , command = pipeline_transformation__calculateResolutionTimeField(field_openDate = 'requested_datetime',
+                                                                      field_closeDate = 'closed_datetime',
+                                                                      data = dataFromApiCall_addClosedDateFields)
+  ), 
+  
+  #____________________________________________________
   #### Run Repeat Calls Analysis ####
   #____________________________________________________
   
@@ -87,7 +113,7 @@ list(
   tar_target(
       name    = repeatCallsAnalysis_initialize
     , command = pipeline_transformation_generateRepeatCallGroupings(
-          dataset        = dataFromApiCall_postExtractValidation
+          dataset        = dataFromApiCall_addTimeToResolve
         , field_orderBy  = "requested_datetime"
         , field_groupBy  = "address"
         , field_category = "subject"
@@ -104,13 +130,13 @@ list(
   , tar_target(
         name = dashboard__overallMetrics
       , command = pipeline_transformation__overallPageMetrics(
-          dataset = dataFromApiCall_postExtractValidation
+          dataset = dataFromApiCall_addTimeToResolve
       )
   )
   , tar_target(
         name = dashboard__weeklyAggregates
       , command = pipeline_transformation_generateWeeklyAggregates(
-          dataset = dataFromApiCall_postExtractValidation
+          dataset = dataFromApiCall_addTimeToResolve
       )
   )
   
